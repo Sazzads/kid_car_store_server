@@ -44,12 +44,19 @@ async function run() {
         //get category toy
         app.get("/alltoys/:text", async (req, res) => {
             // console.log(req.params.text);
-            if (req.params.text == "bus" || req.params.text == "car" || req.params.text == "truck"){
-                const result = await toyCollection.find({category:req.params.text}).toArray();
+            if (req.params.text == "bus" || req.params.text == "car" || req.params.text == "truck") {
+                const result = await toyCollection.find({ category: req.params.text }).toArray();
                 return res.send(result)
             }
             const result = await toyCollection.find({}).toArray();
             res.send(result);
+        })
+
+        //get only my toy list
+        app.get("/mytoys/:email", async (req, res) => {
+            console.log(req.params.email);
+            const result = await toyCollection.find({ email: req.params.email }).toArray()
+            res.send(result)
         })
 
 
