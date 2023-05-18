@@ -28,6 +28,28 @@ async function run() {
         const toyCollection = db.collection('alltoy');
         console.log("database connected");
 
+        //search all toys by name code 
+        const indexKeys = { name: 1 };
+        const indexOptions = { name: "nameSearch" };
+
+        const result = await toyCollection.createIndex(indexKeys, indexOptions);
+
+        app.get('/toySearchByName/:text', async (req, res) => {
+            const searchText = req.params.text;
+
+            const result = await toyCollection.find(
+                {
+                    $or: [
+                        { name: { $regex: searchText, $options: "i" } }
+                    ],
+                }
+            ).toArray()
+
+            res.send(result)
+        })
+
+
+
         //add a toy
         app.post('/postToy', async (req, res) => {
             const body = req.body;
