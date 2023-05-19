@@ -97,7 +97,7 @@ async function run() {
             console.log(id);
             console.log(updateToy);
             const filter = { _id: new ObjectId(id) }
-            
+
             const options = { upsert: true }
             console.log(updateToy);
             const toy = {
@@ -120,6 +120,21 @@ async function run() {
             const result = await toyCollection.deleteOne({ _id: new ObjectId(id) })
             res.send(result)
 
+        })
+
+
+        //sort data
+        // ascendingd
+        app.get("/mytoyascending/:email", async (req, res) => {
+            // console.log(req.params.email);
+            const result = await toyCollection.find({ email: req.params.email }).sort({ price: 1 }).toArray()
+            res.send(result)
+        })
+        //descending 
+        app.get("/mytoydescending/:email", async (req, res) => {
+            // console.log(req.params.email);
+            const result = await toyCollection.find({ email: req.params.email }).sort({ price: -1 }).toArray()
+            res.send(result)
         })
 
 
