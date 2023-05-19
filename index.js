@@ -55,7 +55,7 @@ async function run() {
             const body = req.body;
             const result = await toyCollection.insertOne(body);
             res.send(result)
-            console.log(result);
+            // console.log(result);
         });
 
         //get all toy
@@ -76,10 +76,43 @@ async function run() {
 
         //get only my toy list
         app.get("/mytoys/:email", async (req, res) => {
-            console.log(req.params.email);
+            // console.log(req.params.email);
             const result = await toyCollection.find({ email: req.params.email }).toArray()
             res.send(result)
         })
+
+        // update toy data
+        //get one data by id
+        app.get("/mytoy/:id", async (req, res) => {
+            console.log(req.params.id);
+            const a = (req.params.id);
+            const result = await toyCollection.find({ _id: new ObjectId(a) }).toArray()
+            res.send(result)
+        })
+
+        //update
+        app.put('/mytoy/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateToy = req.body;
+            console.log(id);
+            console.log(updateToy);
+            const filter = { _id: new ObjectId(id) }
+            
+            const options = { upsert: true }
+            console.log(updateToy);
+            const toy = {
+                $set: {
+                    price: updateToy.price,
+                    quantity: updateToy.quantity,
+                    description: updateToy.description,
+                }
+            }
+            const result = await toyCollection.updateOne(filter, toy, options)
+            res.send(result)
+
+        })
+
+
 
         //delete data
         app.delete('/mytoys/:id', async (req, res) => {
