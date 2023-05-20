@@ -17,22 +17,32 @@ const client = new MongoClient(uri, {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
+    },
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
+    // maxPoolSize: 10,
 });
 
 async function run() {
     try {
+        // client.connect((err) => {
+        //     if (err) {
+        //         console.log(err);
+        //         return;
+        //     }
+        // })
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        
+        // await client.connect();
         const db = client.db('carToy');
         const toyCollection = db.collection('alltoy');
         console.log("database connected");
 
         //search all toys by name code 
-        const indexKeys = { name: 1 };
-        const indexOptions = { name: "nameSearch" };
+        // const indexKeys = { name: 1 };
+        // const indexOptions = { name: "nameSearch" };
 
-        const result = await toyCollection.createIndex(indexKeys, indexOptions);
+        // const result = await toyCollection.createIndex(indexKeys, indexOptions);
 
         app.get('/toySearchByName/:text', async (req, res) => {
             const searchText = req.params.text;
@@ -63,6 +73,23 @@ async function run() {
             const result = await toyCollection.find({}).toArray();
             res.send(result);
         })
+        //pAGE WISE LOAD DATA
+        app.get("/alltoyss", async (req, res) => {
+            console.log(req.query);
+            const page = parseInt(req.query.page) || 0;
+            const limit = parseInt(req.query.limit) || 20;
+            const skip = page * limit;
+
+            const result = await toyCollection.find({}).skip(skip).limit(limit).toArray();
+            res.send(result);
+        })
+
+        //get total count 
+        app.get('/totaltoys', async (req, res) => {
+            const result = await toyCollection.estimatedDocumentCount();
+            res.send({ totalToys: result })
+        })
+
         //get category toy
         app.get("/alltoys/:text", async (req, res) => {
             // console.log(req.params.text);
@@ -141,7 +168,7 @@ async function run() {
 
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
